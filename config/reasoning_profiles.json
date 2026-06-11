@@ -1,0 +1,32 @@
+{
+  "generated_at": "2026-06-11",
+  "source_notes": [
+    {
+      "source": "https://developers.openai.com/api/docs/pricing",
+      "note": "La documentation OpenAI expose reasoning_effort comme paramètre mais ne publie pas de multiplicateurs de coût universels."
+    },
+    {
+      "source": "https://openai.com/api/pricing/",
+      "note": "La page de prix officielle facture par tokens visibles/produits et ne fournit pas de coefficients publics par niveau de raisonnement."
+    }
+  ],
+  "transparency": "Aucun coefficient public officiel et stable n'a été trouvé. Pour respecter la consigne 'Ne jamais inventer les coefficients', tous les profils restent à 1.0 par défaut. L'utilisateur peut les modifier localement dans l'interface pour faire des scénarios internes.",
+  "profiles": {
+    "low": {
+      "label": "Faible",
+      "coefficient": 1
+    },
+    "medium": {
+      "label": "Moyen",
+      "coefficient": 1
+    },
+    "high": {
+      "label": "Approfondi",
+      "coefficient": 1
+    },
+    "very_high": {
+      "label": "Très élevé",
+      "coefficient": 1
+    }
+  }
+}

@@ -1,0 +1,180 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#111827">
+  <title>OpenAI Cost Analyzer</title>
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <header class="app-header">
+    <div class="brand">
+      <div class="brand-mark">OC</div>
+      <div>
+        <h1>OpenAI Cost Analyzer</h1>
+        <p class="subtitle">Analyse locale d'exports ChatGPT et simulation de coûts API</p>
+      </div>
+    </div>
+    <div class="header-actions">
+      <button id="themeToggle" class="icon-button" type="button" title="Mode clair / sombre">◐</button>
+      <button id="helpButton" class="icon-button" type="button" title="Aide">i</button>
+    </div>
+  </header>
+
+  <main>
+    <div class="workspace">
+      <aside class="sidebar">
+        <section class="panel">
+          <label id="dropzone" class="dropzone">
+            <input id="fileInput" type="file" accept=".json,.html">
+            <span class="file-button">Sélectionner un export</span>
+            <p class="drop-hint">Glissez-déposez conversations.json ou chat.html</p>
+          </label>
+          <div class="status">
+            <span id="statusText">En attente d'un fichier.</span>
+            <progress id="progress" value="0" max="100"></progress>
+          </div>
+        </section>
+
+        <section class="panel">
+          <h2>Période</h2>
+          <div class="field-grid">
+            <label class="field"><span>Date début</span><input id="startDate" type="date"></label>
+            <label class="field"><span>Date fin</span><input id="endDate" type="date"></label>
+          </div>
+          <div class="quick-ranges">
+            <button type="button" data-range="today">Aujourd'hui</button>
+            <button type="button" data-range="7">7 jours</button>
+            <button type="button" data-range="30">30 jours</button>
+            <button type="button" data-range="90">90 jours</button>
+            <button type="button" data-range="365">1 an</button>
+            <button type="button" data-range="all">Tout</button>
+          </div>
+        </section>
+
+        <section class="panel">
+          <h2>Hypothèses</h2>
+          <div class="field-grid">
+            <label class="field"><span>Méthode tokens</span>
+              <select id="tokenMethod">
+                <option value="simple">Simple</option>
+                <option value="words">Mots</option>
+                <option value="tiktoken">Avancée (fallback offline)</option>
+              </select>
+            </label>
+            <label class="field"><span>Temporalité</span>
+              <select id="granularity">
+                <option value="day">Journalier</option>
+                <option value="week">Hebdomadaire</option>
+                <option value="month">Mensuel</option>
+              </select>
+            </label>
+            <label class="field"><span>Prix mensuel ChatGPT Plus</span><input id="plusPrice" type="number" min="0" step="0.01" value="23"></label>
+          </div>
+          <p class="hint">Méthode utilisée : <strong id="methodLabel">Simple</strong></p>
+        </section>
+
+        <section class="panel">
+          <h2>Raisonnement simulé</h2>
+          <p class="hint">Aucun multiplicateur officiel stable n'est publié. Les coefficients sont modifiables pour vos scénarios.</p>
+          <div class="coeff-grid">
+            <label class="field"><span>Faible</span><input id="lowCoeff" type="number" min="0" step="0.1"></label>
+            <label class="field"><span>Moyen</span><input id="mediumCoeff" type="number" min="0" step="0.1"></label>
+            <label class="field"><span>Approfondi</span><input id="highCoeff" type="number" min="0" step="0.1"></label>
+            <label class="field"><span>Très élevé</span><input id="veryHighCoeff" type="number" min="0" step="0.1"></label>
+          </div>
+        </section>
+      </aside>
+
+      <section class="content">
+        <section id="summaryCards" class="summary-grid"></section>
+
+        <section class="panel">
+          <h2>Comparaison ChatGPT Plus</h2>
+          <div id="comparison" class="comparison"></div>
+          <p id="pricingMeta" class="source-note"></p>
+        </section>
+
+        <section class="panel">
+          <div class="toolbar">
+            <input id="search" type="search" placeholder="Rechercher un modèle">
+            <div class="toolbar-actions">
+              <button id="exportCsv" type="button">Export CSV</button>
+              <button id="exportJson" type="button">Export JSON</button>
+            </div>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th data-sort="model">Modèle</th>
+                  <th data-sort="input">Input Tokens</th>
+                  <th data-sort="output">Output Tokens</th>
+                  <th data-sort="low">Faible</th>
+                  <th data-sort="medium">Moyen</th>
+                  <th data-sort="high">Approfondi</th>
+                  <th data-sort="very_high">Très élevé</th>
+                </tr>
+              </thead>
+              <tbody id="tbody"></tbody>
+            </table>
+          </div>
+          <div id="pagination" class="pagination"></div>
+        </section>
+
+        <section class="panel">
+          <h2>Visualisations</h2>
+          <div class="charts">
+            <article class="chart-card"><h3>Répartition des tokens</h3><canvas id="tokensChart"></canvas></article>
+            <article class="chart-card"><h3>Coût dans le temps</h3><canvas id="timelineChart"></canvas></article>
+            <article class="chart-card"><h3>Coût par modèle</h3><canvas id="modelCostChart"></canvas></article>
+            <article class="chart-card"><h3>Impact du raisonnement</h3><canvas id="reasoningChart"></canvas></article>
+          </div>
+        </section>
+
+        <section class="panel limitations">
+          <h2>Limites de l'estimation</h2>
+          <ul>
+            <li>Les tokens internes de raisonnement ne sont pas accessibles dans les exports ChatGPT.</li>
+            <li>Les niveaux de raisonnement sont simulés et ne représentent pas une facturation officielle.</li>
+            <li>Les tokens sont estimés par approximation locale, sauf intégration future d'un encodeur exact.</li>
+            <li>Les modèles et tarifs OpenAI évoluent dans le temps.</li>
+            <li>Les résultats ne remplacent pas le tableau de bord de facturation OpenAI.</li>
+          </ul>
+        </section>
+      </section>
+    </div>
+  </main>
+
+  <dialog id="helpModal">
+    <div class="modal-header">
+      <h2>Comment récupérer mon export ChatGPT ?</h2>
+      <button id="closeHelp" class="icon-button" type="button" title="Fermer">×</button>
+    </div>
+    <div class="modal-body">
+      <ol class="help-list">
+        <li>Connectez-vous à ChatGPT.</li>
+        <li>Ouvrez votre profil, puis Settings.</li>
+        <li>Allez dans Data Controls.</li>
+        <li>Sous Export Data, cliquez Export puis Confirm export.</li>
+        <li>Ouvrez l'email reçu et téléchargez l'archive avant expiration du lien.</li>
+        <li>Décompressez l'archive et importez conversations.json dans cette application.</li>
+      </ol>
+      <p class="source-note">L'export peut prendre plusieurs minutes à plusieurs heures selon la taille de votre historique. OpenAI indique aussi que l'arrivée peut prendre jusqu'à 7 jours et que le lien expire après 24 heures.</p>
+      <p class="source-note">Source vérifiée le 2026-06-11 : help.openai.com, article "How do I export my ChatGPT history and data?".</p>
+    </div>
+  </dialog>
+
+  <script src="js/vendor/dayjs.min.js"></script>
+  <script src="js/vendor/papaparse.min.js"></script>
+  <script src="js/vendor/chart.umd.min.js"></script>
+  <script src="js/helpers.js"></script>
+  <script src="js/pricing.js"></script>
+  <script src="js/parser.js"></script>
+  <script src="js/charts.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

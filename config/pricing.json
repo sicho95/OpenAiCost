@@ -1,0 +1,83 @@
+{
+  "generated_at": "2026-06-11",
+  "currency": "USD",
+  "unit": "per_1m_tokens",
+  "source": "https://openai.com/api/pricing/",
+  "notes": [
+    "Tarifs standards sous 270K tokens de contexte relevés sur la page officielle OpenAI API Pricing le 2026-06-11.",
+    "Les modèles introuvables ou futurs sont conservés comme modèles détectés mais marqués unknown dans l'application."
+  ],
+  "models": {
+    "gpt-5.5": {
+      "label": "GPT-5.5",
+      "input": 5,
+      "cached_input": 0.5,
+      "output": 30
+    },
+    "gpt-5.4": {
+      "label": "GPT-5.4",
+      "input": 2.5,
+      "cached_input": 0.25,
+      "output": 15
+    },
+    "gpt-5.4-mini": {
+      "label": "GPT-5.4 mini",
+      "aliases": ["gpt-5.4 mini", "gpt-5.4-mini"],
+      "input": 0.75,
+      "cached_input": 0.075,
+      "output": 4.5
+    },
+    "gpt-5.2": {
+      "label": "GPT-5.2",
+      "unknown": true
+    },
+    "gpt-5.1": {
+      "label": "GPT-5.1",
+      "unknown": true
+    },
+    "gpt-5": {
+      "label": "GPT-5",
+      "unknown": true
+    },
+    "gpt-5-mini": {
+      "label": "GPT-5 mini",
+      "unknown": true
+    },
+    "gpt-5-nano": {
+      "label": "GPT-5 nano",
+      "unknown": true
+    },
+    "gpt-4.1": {
+      "label": "GPT-4.1",
+      "unknown": true
+    },
+    "gpt-4.1-mini": {
+      "label": "GPT-4.1 mini",
+      "unknown": true
+    },
+    "gpt-4.1-nano": {
+      "label": "GPT-4.1 nano",
+      "unknown": true
+    },
+    "gpt-4o": {
+      "label": "GPT-4o",
+      "unknown": true
+    },
+    "gpt-4o-mini": {
+      "label": "GPT-4o mini",
+      "unknown": true
+    },
+    "o3": {
+      "label": "o3",
+      "unknown": true
+    },
+    "o4-mini": {
+      "label": "o4-mini",
+      "unknown": true
+    },
+    "o1": {
+      "label": "o1",
+      "unknown": true
+    }
+  }
+}
